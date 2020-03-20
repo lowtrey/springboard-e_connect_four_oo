@@ -1,6 +1,7 @@
 class Game {
-  constructor(height, width) {
-    this.currentPlayer = 1;
+  constructor(playerOne, playerTwo, height = 6, width = 7) {
+    this.players = [playerOne, playerTwo];
+    this.currentPlayer = this.players[0];
     this.gameOver = false;
     this.HEIGHT = height;
     this.WIDTH = width;
@@ -60,8 +61,9 @@ class Game {
 
   placeInTable(y, x) {
     const piece = document.createElement("div");
+
     piece.classList.add("piece");
-    piece.classList.add(`p${this.currentPlayer}`);
+    piece.style.backgroundColor = this.currentPlayer.color;
     piece.style.top = -50 * (y + 2);
 
     const spot = document.getElementById(`${y}-${x}`);
@@ -89,10 +91,11 @@ class Game {
     this.board[y][x] = this.currentPlayer;
     this.placeInTable(y, x);
 
-    console.log(top);
     // check for win
     if (this.checkForWin()) {
-      return this.endGame(`Player ${this.currentPlayer} won!`);
+      return this.endGame(
+        `Player ${this.players.indexOf(this.currentPlayer) + 1} won!`
+      );
     }
 
     // check for tie
@@ -101,7 +104,10 @@ class Game {
     }
 
     // switch players
-    this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
+    this.currentPlayer =
+      this.currentPlayer === this.players[0]
+        ? this.players[1]
+        : this.players[0];
   }
 
   checkForWin() {
@@ -152,7 +158,22 @@ class Game {
   }
 }
 
-const startButton = document.getElementById("start");
-startButton.addEventListener("click", function() {
-  new Game(6, 7);
+class Player {
+  constructor(color) {
+    this.color = color;
+  }
+}
+
+const colorForm = document.getElementById("colorForm");
+
+colorForm.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const colorOne = event.target.colorOne.value || "blue";
+  const colorTwo = event.target.colorTwo.value || "red";
+
+  new Game(new Player(colorOne), new Player(colorTwo));
+
+  event.target.colorOne.value = " ";
+  event.target.colorTwo.value = " ";
 });
