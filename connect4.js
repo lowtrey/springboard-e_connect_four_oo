@@ -1,14 +1,15 @@
 class Game {
   constructor(height, width) {
+    this.currentPlayer = 1;
+    this.gameOver = false;
     this.HEIGHT = height;
-    this.currPlayer = 1;
     this.WIDTH = width;
     this.makeBoard();
     this.makeHtmlBoard();
   }
 
   makeBoard() {
-    this.board = [];
+    this.board = []; // REVISIT
     for (let y = 0; y < this.HEIGHT; y++) {
       this.board.push(Array.from({ length: this.WIDTH }));
     }
@@ -16,13 +17,14 @@ class Game {
 
   makeHtmlBoard() {
     const board = document.getElementById("board");
-    // board.innerHTML = "";
+    // clear previous board
+    board.innerHTML = "";
 
     // make column tops (clickable area for adding a piece to that column)
     const top = document.createElement("tr");
     top.setAttribute("id", "column-top");
 
-    this.handleGameClick = this.handleClick.bind(this);
+    this.handleGameClick = this.handleClick.bind(this); // REVISIT
     top.addEventListener("click", this.handleGameClick);
 
     for (let x = 0; x < this.WIDTH; x++) {
@@ -59,7 +61,7 @@ class Game {
   placeInTable(y, x) {
     const piece = document.createElement("div");
     piece.classList.add("piece");
-    piece.classList.add(`p${this.currPlayer}`);
+    piece.classList.add(`p${this.currentPlayer}`);
     piece.style.top = -50 * (y + 2);
 
     const spot = document.getElementById(`${y}-${x}`);
@@ -68,6 +70,9 @@ class Game {
 
   endGame(msg) {
     alert(msg);
+    document
+      .getElementById("column-top")
+      .removeEventListener("click", this.handleGameClick);
   }
 
   handleClick(evt) {
@@ -81,12 +86,13 @@ class Game {
     }
 
     // place piece in board and add to HTML table
-    this.board[y][x] = this.currPlayer;
+    this.board[y][x] = this.currentPlayer;
     this.placeInTable(y, x);
 
+    console.log(top);
     // check for win
     if (this.checkForWin()) {
-      return this.endGame(`Player ${this.currPlayer} won!`);
+      return this.endGame(`Player ${this.currentPlayer} won!`);
     }
 
     // check for tie
@@ -95,10 +101,11 @@ class Game {
     }
 
     // switch players
-    this.currPlayer = this.currPlayer === 1 ? 2 : 1;
+    this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
   }
 
   checkForWin() {
+    // REVISIT
     const _win = cells => {
       return cells.every(
         ([y, x]) =>
@@ -106,7 +113,7 @@ class Game {
           y < this.HEIGHT &&
           x >= 0 &&
           x < this.WIDTH &&
-          this.board[y][x] === this.currPlayer
+          this.board[y][x] === this.currentPlayer
       );
     };
 
@@ -145,4 +152,7 @@ class Game {
   }
 }
 
-new Game(6, 7);
+const startButton = document.getElementById("start");
+startButton.addEventListener("click", function() {
+  new Game(6, 7);
+});
